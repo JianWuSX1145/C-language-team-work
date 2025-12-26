@@ -30,6 +30,10 @@ int tackCnt = 0; // 统计任务数量
 int userNextId = 1; // 用来分配用户Id
 int taskNextId = 1; // 用来分配任务Id
 bool login = false; // 是否登录
+int adminMod = 0; // 后台
+
+//管理员密码
+static char adminPwd[10] = "admin";
 
 void printLine() {
     printf("==========================================================\n");
@@ -51,6 +55,40 @@ void head(char * str) {
     return;
 }
 
+void adminCommands() {
+    while (1) {
+        char input[10];
+        head("命令");
+        printf("/back\n");
+        printf("/list\n");
+        printLine();
+        scanf("%s", input);
+        if (strcmp(input, "/back") == 0) return;
+        else if (strcmp(input, "/list") == 0) {
+            if (userCnt == 0) {
+                printf("EMPTY\n");
+                system("pause");
+                continue;
+            }
+            for (int i = 0; i < userCnt; i++) {
+                printf(
+                    "id: %d name: %s pwd: %s phone: %s credit: %d money: %.2f\n",
+                    users[i].id,
+                    users[i].name,
+                    users[i].pwd,
+                    users[i].phone,
+                    users[i].credit,
+                    users[i].money
+                );
+            }
+            system("pause");
+        }
+        else {
+            error();
+        }
+    }
+    
+}
 
 // 用户注册
 void userRegister() {
@@ -168,11 +206,19 @@ void start() {
     printf("请登录或注册!\n");
     printLine();
     printf("我要登录:(1)\n");
-    printf("我要注册:(2)\n");
+    printf("我要注册:(2)        管理员? (0)\n");
     printLine();
     scanf("%d", &input);
     switch (input)
     {
+    case 0:
+        char pwdx[50];
+        printf("请输入密码:");
+        scanf("%s", &pwdx);
+        if (strcmp(pwdx, adminPwd) == 0) {
+            adminMod = 1 - adminMod;
+        }
+        break;
     case 1:
         if (userCnt == 0) {
             printLine();
@@ -219,6 +265,9 @@ int main() {
     while (1) {
         head("欢迎");
         printf("欢迎来到本系统!\n退出:(-1)\n前进:(1)\n");
+        if (adminMod == 1) {
+            printf("管理员界面(0)\n");
+        }
         printLine();
         int choice;
         scanf("%d", &choice);
@@ -265,6 +314,9 @@ int main() {
                     error();
                 }
             }
+        }
+        else if (adminMod == 1 && choice == 0) {
+            adminCommands();
         }
         else {
             error();
