@@ -1,72 +1,242 @@
-// å¤´æ–‡ä»¶è°ƒç”¨
+// Í·ÎÄ¼şµ÷ÓÃ
 #include <stdio.h>
 #include <stdlib.h>
 #include <string.h>
+#include <stdbool.h>
 
-// ç»“æ„ä½“
+// ½á¹¹Ìå
 
 typedef struct {
     int id;
-    char name[20], pwd[20], phone[12]; // åç§° å¯†ç  ç”µè¯å·ç 
-    int type; // ç±»å‹   
-    int credit; // ç§¯åˆ†
-    double money; // ä½™é¢
+    char name[20], pwd[20], phone[12]; // Ãû³Æ ÃÜÂë µç»°ºÅÂë 
+    int credit; // »ı·Ö
+    double money; // Óà¶î
 } User;
 
 typedef struct {
-    int id; // ä»»åŠ¡id
-    int pubId; // å‘å¸ƒè€…
-    int runId; // æ¥å•è€…
-    char title[50], content[100]; // æ ‡é¢˜ å†…å®¹
-    double reward; // é…¬é‡‘
-    int status; // çŠ¶æ€ï¼ˆæœªæ¥å• å·²æ¥å•ï¼‰
+    int id; // ÈÎÎñid
+    int pubId; // ·¢²¼Õß
+    int runId; // ½Óµ¥Õß
+    char title[50], content[100]; // ±êÌâ ÄÚÈİ
+    double reward; // ³ê½ğ
+    int status; // ×´Ì¬£¨Î´½Óµ¥ ÒÑ½Óµ¥£©
 } Task;
 
-// å…¨å±€å˜é‡
+// È«¾Ö±äÁ¿
 User users[100], currentUser;
 Task tasks[100];
-int userCnt = 0; // ç»Ÿè®¡ç”¨æˆ·æ•°é‡
-int tackCnt = 0; // ç»Ÿè®¡ä»»åŠ¡æ•°é‡
-int userNextId = 1; // ç”¨æ¥åˆ†é…ç”¨æˆ·Id
-int taskNextId = 1; // ç”¨æ¥åˆ†é…ä»»åŠ¡Id
+int userCnt = 0; // Í³¼ÆÓÃ»§ÊıÁ¿
+int tackCnt = 0; // Í³¼ÆÈÎÎñÊıÁ¿
+int userNextId = 1; // ÓÃÀ´·ÖÅäÓÃ»§Id
+int taskNextId = 1; // ÓÃÀ´·ÖÅäÈÎÎñId
+bool login = false; // ÊÇ·ñµÇÂ¼
 
 void printLine() {
-    printf("==========================================================");
+    printf("==========================================================\n");
+    
 }
 
 
-// ç”¨æˆ·æ³¨å†Œä¸ç™»å½•
+// ±¨´í¸ñÊ½
+void error() {
+    printf("Çë¼ì²éÊäÈëÊÇ·ñÕıÈ·!\n");
+    system("pause");
+}
+
+// Ò³ÃæÍ·¸ñÊ½
+void head(char * str) {
+    system("cls");
+    printf("ÄúÏÖÔÚ´¦ÓÚ %s ½çÃæ!\n", str);
+    printLine();
+    return;
+}
+
+
+// ÓÃ»§×¢²á
 void userRegister() {
-    printLine();
+    char input[50];
+    int len; // ÊäÈëÖµ³¤¶È
+    int flag = 0; // ×¢²á½ø¶È
+
+    /*ÊäÈë²¿·Ö¿ªÍ·*/
+    while (flag == 0) {
+        head("×¢²á");
+        printf("ÇëÊäÈëÄúµÄÓÃ»§Ãû(³¤¶È1 ~ 19, ²»º¬¿Õ¸ñ):");
+        scanf("%s", input);
+        len = strlen(input);
+        if (len > 20) {
+            error();
+            continue;
+        }
+        strcpy(users[userCnt].name, input);
+        flag++;
+        break;
+    }
+    while (flag == 1) {
+        head("×¢²á");
+        printf("ÇëÊäÈëÄúµÄÃÜÂë(³¤¶È1 ~ 19), ²»º¬¿Õ¸ñ:");
+        scanf("%s", input);
+        len = strlen(input);
+        if (len > 20) {
+            error();
+            continue;
+        }
+        strcpy(users[userCnt].pwd, input);
+        flag++;
+        break;
+    }
+    while (flag == 2) {
+        head("×¢²á");
+        printf("ÇëÊäÈëÄúµÄµç»°ºÅÂë(³¤¶È11):");
+        scanf("%s", input);
+        len = strlen(input);
+        if (len != 11) {
+            error();
+            continue;
+        }
+        strcpy(users[userCnt].phone, input);
+        flag++;
+        break;
+    }
+    // ÒÔÏÂÎª·ÇÊäÈëÊı¾İ³õÊ¼»¯
+    {
+        users[userCnt].credit = 0;
+        users[userCnt].id = userNextId;
+        users[userCnt].money = 0;
+    }
+    // ÒÔÏÂÎªÈ«¾Ö±äÁ¿×ÔÔö
+    {
+        userNextId++;
+        userCnt++;
+    }
+    /*ÊäÈë²¿·Ö½áÎ²*/
+    
 }
 
+// ÓÃ»§µÇÂ¼
 int userLogin() {
-    printLine();
+    char namex[20], pwdx[20];
+    int len; // ÊäÈëÖµ³¤¶È
+    int flag = 0; // µÇÂ¼½ø¶È
+
+    /*ÊäÈë²¿·Ö¿ªÍ·*/
+    while (flag == 0) {
+        head("µÇÂ¼");
+        printf("ÇëÊäÈëÄúµÄÓÃ»§Ãû:");
+        scanf("%s", namex);
+        flag++;
+        break;
+    }
+    while (flag == 1) {
+        head("µÇÂ¼");
+        printf("ÇëÊäÈëÄúµÄÃÜÂë:");
+        scanf("%s", pwdx);
+        flag++;
+        break;
+    }
+    
+    //ÑéÖ¤ÊÇ·ñ´æÔÚ
+    bool exist = false;
+    int p;
+    for (int i = 0; i < userCnt; i++) {
+        if (strcmp(users[i].name, namex) == 0) {
+            if (strcmp(users[i].pwd, pwdx) == 0) {
+                p = i;
+                exist = true;
+                break;
+            }
+        }
+    }
+    if (exist) {
+        currentUser = users[p];
+        login = true;
+        printLine();
+        printf("ÄúÒÑ³É¹¦µÇÂ¼!\n");
+        system("pause");
+    }
+    else {
+        printLine();
+        printf("ÓÃ»§Ãû»òÃÜÂë´íÎó£¬ÇëÖØÊÔ!");
+        system("pause");
+    }
 }
 
-// å‘å¸ƒä»»åŠ¡
+//µÇÂ¼×¢²áÑ¡Ôñ½çÃæ
+void start() {
+    int input;
+    system("cls");
+    printf("ÇëµÇÂ¼»ò×¢²á!\n");
+    printLine();
+    printf("ÎÒÒªµÇÂ¼:(1)\n");
+    printf("ÎÒÒª×¢²á:(2)\n");
+    printLine();
+    scanf("%d", &input);
+    switch (input)
+    {
+    case 1:
+        if (userCnt == 0) {
+            printLine();
+            printf("ÏµÍ³ÖĞ»¹Ã»ÓĞÓÃ»§£¡\n");
+            system("pause");
+            break;
+        }
+        userLogin();
+        break;
+
+    case 2:
+        userRegister();
+        break;
+    
+    default:
+        error();
+        break;
+    }
+}
+
+// ·¢²¼ÈÎÎñ
 void publishTask() {
     printLine();
 }
 
-// æµè§ˆä¸æ¥å•
+// ä¯ÀÀÓë½Óµ¥
 void browseTask() {
     printLine();
 }
 
-// æŸ¥çœ‹ä¸å¤„ç†
+// ²é¿´Óë´¦Àí
 void checkTask() {
     printLine();
 }
 
-// å……å€¼
+// ³äÖµ
 void Recharge() {
     printLine();
 }
 
-// ä¸»å‡½æ•°
+// Ö÷º¯Êı
 
 int main() {
-
+    while (1) {
+        head("»¶Ó­");
+        printf("»¶Ó­À´µ½±¾ÏµÍ³!\nÍË³ö:(-1)\nÇ°½ø:(1)\n");
+        printLine();
+        int choice;
+        scanf("%d", &choice);
+        if (choice == -1) {
+            break;
+        }
+        else if (choice == 1) {
+            if (!login) {
+                start();
+            }
+            else {
+                /*Ê£ÏÂ´úÂëÖ±½ÓÈû½øÀ´*/
+            }
+        }
+        else {
+            error();
+        }
+    }
+    return 0;
 }
 
