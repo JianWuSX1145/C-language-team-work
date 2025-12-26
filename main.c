@@ -55,6 +55,7 @@ void head(char * str) {
     return;
 }
 
+//控制面板
 void adminCommands() {
     while (1) {
         char input[10];
@@ -106,6 +107,20 @@ void userRegister() {
             error();
             continue;
         }
+
+        //重复性验证
+        bool exist = false;
+        for (int i = 0; i < userCnt; i++) {
+            if (strcmp(users[i].name, input) == 0) {
+                exist = true;
+                printf("用户名已经存在，请更换\n");
+                system("pause");
+            }
+        }
+        if (exist) {
+            continue;
+        }
+
         strcpy(users[userCnt].name, input);
         flag++;
         break;
