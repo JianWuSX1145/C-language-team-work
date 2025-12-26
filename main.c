@@ -230,6 +230,10 @@ int main() {
                 start();
             }
             else {
+                system("cls");
+                printf("您现在处于 %s 的主页!\n", currentUser.name);
+                printLine();
+                system("pause");
                 /*剩下代码直接塞进来*/
             }
         }
